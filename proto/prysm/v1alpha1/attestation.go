@@ -362,26 +362,7 @@ func (a *SingleAttestation) GetCommitteeIndex() primitives.CommitteeIndex {
 	return a.CommitteeId
 }
 
-// ToAttestationElectra converts the attestation to an AttestationElectra.
-func (a *SingleAttestation) ToAttestationElectra(committee []primitives.ValidatorIndex) *AttestationElectra {
-	cb := primitives.NewAttestationCommitteeBits()
-	cb.SetBitAt(uint64(a.CommitteeId), true)
-
-	ab := bitfield.NewBitlist(uint64(len(committee)))
-	for i, ix := range committee {
-		if a.AttesterIndex == ix {
-			ab.SetBitAt(uint64(i), true)
-			break
-		}
-	}
-
-	return &AttestationElectra{
-		AggregationBits: ab,
-		Data:            a.Data,
-		Signature:       a.Signature,
-		CommitteeBits:   cb,
-	}
-}
+// ToAttestationElectra is defined in attestation_mainnet.go and attestation_minimal.go
 
 // Version --
 func (a *IndexedAttestation) Version() int {
