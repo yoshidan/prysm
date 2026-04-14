@@ -259,9 +259,9 @@ func (b *BeaconStateFulu) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 		dst = append(dst, b.HistoricalRoots[ii]...)
 	}
 
-	// Field (9) 'Eth1DataVotes'
-	if size := len(b.Eth1DataVotes); size > 2048 {
-		err = ssz.ErrListTooBigFn("--.Eth1DataVotes", size, 2048)
+	// Field (9) 'Eth1DataVotes' - minimal: 4 * 8 = 32 (mainnet: 64 * 32 = 2048)
+	if size := len(b.Eth1DataVotes); size > 32 {
+		err = ssz.ErrListTooBigFn("--.Eth1DataVotes", size, 32)
 		return
 	}
 	for ii := 0; ii < len(b.Eth1DataVotes); ii++ {
@@ -340,9 +340,9 @@ func (b *BeaconStateFulu) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 		}
 	}
 
-	// Field (35) 'PendingPartialWithdrawals'
-	if size := len(b.PendingPartialWithdrawals); size > 134217728 {
-		err = ssz.ErrListTooBigFn("--.PendingPartialWithdrawals", size, 134217728)
+	// Field (35) 'PendingPartialWithdrawals' - minimal: 64 (mainnet: 134217728)
+	if size := len(b.PendingPartialWithdrawals); size > 64 {
+		err = ssz.ErrListTooBigFn("--.PendingPartialWithdrawals", size, 64)
 		return
 	}
 	for ii := 0; ii < len(b.PendingPartialWithdrawals); ii++ {
@@ -351,9 +351,9 @@ func (b *BeaconStateFulu) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 		}
 	}
 
-	// Field (36) 'PendingConsolidations'
-	if size := len(b.PendingConsolidations); size > 262144 {
-		err = ssz.ErrListTooBigFn("--.PendingConsolidations", size, 262144)
+	// Field (36) 'PendingConsolidations' - minimal: 64 (mainnet: 262144)
+	if size := len(b.PendingConsolidations); size > 64 {
+		err = ssz.ErrListTooBigFn("--.PendingConsolidations", size, 64)
 		return
 	}
 	for ii := 0; ii < len(b.PendingConsolidations); ii++ {
@@ -604,10 +604,10 @@ func (b *BeaconStateFulu) UnmarshalSSZ(buf []byte) error {
 		}
 	}
 
-	// Field (9) 'Eth1DataVotes'
+	// Field (9) 'Eth1DataVotes' - minimal: 32 (mainnet: 2048)
 	{
 		buf = tail[o9:o11]
-		num, err := ssz.DivideInt2(len(buf), 72, 2048)
+		num, err := ssz.DivideInt2(len(buf), 72, 32)
 		if err != nil {
 			return err
 		}
@@ -737,10 +737,10 @@ func (b *BeaconStateFulu) UnmarshalSSZ(buf []byte) error {
 		}
 	}
 
-	// Field (35) 'PendingPartialWithdrawals'
+	// Field (35) 'PendingPartialWithdrawals' - minimal: 64 (mainnet: 134217728)
 	{
 		buf = tail[o35:o36]
-		num, err := ssz.DivideInt2(len(buf), 24, 134217728)
+		num, err := ssz.DivideInt2(len(buf), 24, 64)
 		if err != nil {
 			return err
 		}
@@ -755,10 +755,10 @@ func (b *BeaconStateFulu) UnmarshalSSZ(buf []byte) error {
 		}
 	}
 
-	// Field (36) 'PendingConsolidations'
+	// Field (36) 'PendingConsolidations' - minimal: 64 (mainnet: 262144)
 	{
 		buf = tail[o36:]
-		num, err := ssz.DivideInt2(len(buf), 16, 262144)
+		num, err := ssz.DivideInt2(len(buf), 16, 64)
 		if err != nil {
 			return err
 		}
@@ -911,11 +911,11 @@ func (b *BeaconStateFulu) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 		return
 	}
 
-	// Field (9) 'Eth1DataVotes'
+	// Field (9) 'Eth1DataVotes' - minimal: 32 (mainnet: 2048)
 	{
 		subIndx := hh.Index()
 		num := uint64(len(b.Eth1DataVotes))
-		if num > 2048 {
+		if num > 32 {
 			err = ssz.ErrIncorrectListSize
 			return
 		}
@@ -924,7 +924,7 @@ func (b *BeaconStateFulu) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 				return
 			}
 		}
-		hh.MerkleizeWithMixin(subIndx, num, 2048)
+		hh.MerkleizeWithMixin(subIndx, num, 32)
 	}
 
 	// Field (10) 'Eth1DepositIndex'
@@ -1125,11 +1125,11 @@ func (b *BeaconStateFulu) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 		hh.MerkleizeWithMixin(subIndx, num, 134217728)
 	}
 
-	// Field (35) 'PendingPartialWithdrawals'
+	// Field (35) 'PendingPartialWithdrawals' - minimal: 64 (mainnet: 134217728)
 	{
 		subIndx := hh.Index()
 		num := uint64(len(b.PendingPartialWithdrawals))
-		if num > 134217728 {
+		if num > 64 {
 			err = ssz.ErrIncorrectListSize
 			return
 		}
@@ -1138,14 +1138,14 @@ func (b *BeaconStateFulu) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 				return
 			}
 		}
-		hh.MerkleizeWithMixin(subIndx, num, 134217728)
+		hh.MerkleizeWithMixin(subIndx, num, 64)
 	}
 
-	// Field (36) 'PendingConsolidations'
+	// Field (36) 'PendingConsolidations' - minimal: 64 (mainnet: 262144)
 	{
 		subIndx := hh.Index()
 		num := uint64(len(b.PendingConsolidations))
-		if num > 262144 {
+		if num > 64 {
 			err = ssz.ErrIncorrectListSize
 			return
 		}
@@ -1154,7 +1154,7 @@ func (b *BeaconStateFulu) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 				return
 			}
 		}
-		hh.MerkleizeWithMixin(subIndx, num, 262144)
+		hh.MerkleizeWithMixin(subIndx, num, 64)
 	}
 
 	// Field (37) 'ProposerLookahead' - minimal: 16 elements (mainnet: 64)
