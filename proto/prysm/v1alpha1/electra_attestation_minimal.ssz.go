@@ -129,11 +129,12 @@ func (a *AttestationElectra) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	indx := hh.Index()
 
 	// Field (0) 'AggregationBits'
+	// Minimal preset: MAX_VALIDATORS_PER_COMMITTEE * MAX_COMMITTEES_PER_SLOT = 2048 * 4 = 8192
 	if len(a.AggregationBits) == 0 {
 		err = ssz.ErrEmptyBitlist
 		return
 	}
-	hh.PutBitlist(a.AggregationBits, 131072)
+	hh.PutBitlist(a.AggregationBits, 8192)
 
 	// Field (1) 'Data'
 	if err = a.Data.HashTreeRootWith(hh); err != nil {
